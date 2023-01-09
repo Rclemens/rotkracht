@@ -1,0 +1,23 @@
+{
+    "Training":
+    [
+        {
+            "id" : "Guid",
+            "created" :"datetime",
+            "date" : "datetime",
+            "datekey" : "202212",
+            "lesson" : [
+                {
+                    "id" :"Guid",
+                    "start" : "datetime",
+                    "duration" : 1,
+                    "isPrivate" : true,
+                    "Users" : [
+                        "Guid1",
+                        "Guid2"
+                    ]
+                }
+            ]
+        }
+    ]
+}

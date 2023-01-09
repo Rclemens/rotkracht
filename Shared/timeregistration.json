@@ -1,0 +1,24 @@
+{
+    "time" : 
+    [
+        {
+            "id" : "Guid",
+            "lessonId" :"Guid",
+            "datekey" : "202212", 
+            "email" : "email",
+            "phoneNumber" : "",
+            "lesson" : [
+                {
+                    "lessonId" :"Guid",
+                    "date" : "datetime",
+                    "Users" : 
+                    [
+                        "Guid1",
+                        "Guid2"
+                    ]
+                }
+            ]
+        }
+    ]
+ 
+}

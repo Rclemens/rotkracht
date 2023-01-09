@@ -1,0 +1,14 @@
+{
+    "id" : "Guid",
+    "created" :"datetime",
+    "date" : "datetime",
+    "datekey" : "userid",
+    "email" : "email",
+    "phoneNumber" : "",
+    "lesson" : [
+        {
+            "lessonId" :"Guid",
+            "datekey" : "key"
+        }
+    ]
+}
