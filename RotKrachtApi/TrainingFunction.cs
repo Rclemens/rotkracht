@@ -7,12 +7,23 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RotKrachtApi.Models;
+using BlazorApp.Shared;
+using Microsoft.Azure.Cosmos;
 
 namespace RotKrachtApi
 {
-    public static class TrainingFunction
+    public class TrainingFunction
     {
+        private readonly CosmosClient _cosmosClient;
+        private Container _documentContainer;
+
+        public TrainingFunction(CosmosClient cosmosClient)
+        {
+            _cosmosClient = cosmosClient;
+            _documentContainer = _cosmosClient.GetContainer("Rotkracht","Trainings");
+        }
+
+
         [FunctionName("GetTraining")]
         public static async Task<IActionResult> GetTraining(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)] HttpRequest req,
@@ -34,7 +45,7 @@ namespace RotKrachtApi
         }
 
         [FunctionName("AddTraining")]
-        public static async Task<IActionResult> AddTraining(
+        public async Task<IActionResult> AddTraining(
             [HttpTrigger(AuthorizationLevel.Function, "Post", Route = null)] HttpRequest req,
             ILogger log)
         {
@@ -42,6 +53,10 @@ namespace RotKrachtApi
 
             string requestData = await new StreamReader(req.Body).ReadToEndAsync().ConfigureAwait(false);
             var item  = JsonConvert.DeserializeObject<Training>(requestData);
+
+            item.Created = DateTime.Now;
+
+            await _documentContainer.CreateItemAsync(item, new PartitionKey(item.DateKey));
 
             return new OkObjectResult(item);
         }

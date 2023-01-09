@@ -2,8 +2,113 @@
 @using BlazorApp.Shared
 @inject HttpClient Http
 
-<h1>Account</h1>
+<div class="container">
+    <form>
+        <div class="row">
+            <div class="col"><h1>Account</h1></div>
+        </div>
+
+        <div class="row">
+            <div class="col-3">
+                <div class="form-floating">
+                    <input type="text" id="firstname" @bind=user.FirstName readonly=@disableSaveButton class="form-control form-control-plaintext" />
+                    <label for="firstname">Voornaam</label>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-floating">
+                    <input type="text" id="lastname" @bind=user.LastName readonly=@disableSaveButton class="form-control form-control-plaintext" />
+                    <label for="lastname">Achternaam</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <div class="form-floating">
+                    <input type="text" id="phonenumber" @bind=user.PhoneNumber readonly=@disableSaveButton class="form-control form-control-plaintext" />
+                    <label for="phonenumber">Telefoonnummer</label>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-floating">
+                    <input type="email" id="email" @bind=user.Email readonly=@disableSaveButton class="form-control form-control-plaintext" />
+                    <label for="email">Email</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <input type="checkbox" class="form-check-input" @bind=isChecked id="changeCb" @oninput="CheckboxChanged">
+                <label class="form-check-label" for="changeCb">Aanpassen</label>
+            </div>
+            <div class="col-2">
+                @if (userInfoUpdated)
+                {
+                    <span>Opgeslagen!</span>
+                }
+            </div>
+            <div class="col-1">
+                <button type="button" class="btn btn-primary float-end" @onclick="UpdateUserInfo" disabled=@disableSaveButton>Opslaan</button>
+            </div>
+        </div>
+    </form>
+</div>
+
 
 @code {
+    User? user = new();
+    User? clonedUser = null;
+    string EmailTest = "test";
+    string email = "raymondclemens@gmail.com";
+    bool userInfoUpdated;
+    bool disableSaveButton = true;
+    bool isChecked;
 
+    async void UpdateUserInfo()
+    {
+        Console.WriteLine($"Button clicked");
+        StateHasChanged();
+        var btnAlert = clonedUser.Equals(user) ? "Nothing changed!" : "UserInfo changed";
+        Console.WriteLine(btnAlert);
+
+        if (!clonedUser.Equals(user))
+        {
+            var result = await Http.PostAsJsonAsync<User>($"/api/user", user);
+
+            if(result.IsSuccessStatusCode)
+            {
+                userInfoUpdated = true;
+                disableSaveButton = true;
+                isChecked = false;
+                StateHasChanged();
+            }
+
+            await Task.Delay(3000);  // x = 2
+            userInfoUpdated = false;
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            user = await Http.GetFromJsonAsync<User>($"/api/user/{email}");
+            clonedUser = (User)user.Clone();
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.ToString());
+        }
+
+    }
+
+    async void CheckboxChanged(ChangeEventArgs e)
+    {
+        disableSaveButton = !(bool)e.Value;
+        Console.WriteLine($"Checkbox value {disableSaveButton}");
+        StateHasChanged();
+    }
 }
