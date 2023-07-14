@@ -1,0 +1,1497 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "servicelocations",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Eneco Integration Team",
+      "url": "https://developer.enecogroup.com",
+      "email": "FM_BTO_Integration_Team@eneco.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api-acc.enecogroup.com"
+    }
+  ],
+  "security": [
+    {
+      "apikey": [],
+      "azureAD": []
+    }
+  ],
+  "paths": {
+    "/v2/servicelocations/{serviceLocationId}": {
+      "get": {
+        "tags": [
+          "servicelocation"
+        ],
+        "operationId": "GET/servicelocations/{serviceLocationId}",
+        "summary": "Lookup Service Location by Id",
+        "description": "Get Service Location details by Id, optionally with Product/Location Eligibilties",
+        "parameters": [
+          {
+            "name": "serviceLocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/serviceLocationId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/pEmbed"
+          },
+          {
+            "$ref": "#/components/parameters/pXRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ServiceLocation"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{label}/v2/servicelocations/eligible": {
+      "post": {
+        "tags": [
+          "servicelocation"
+        ],
+        "operationId": "POST/{label}/servicelocations/eligible",
+        "summary": "Lookup Service Location by Service Location Id or Connection EAN code for Guided Sales",
+        "description": "**!!This service is intended for use by Guided Sales process (Orion) only!!**\n\nLookup Service Location and Product Eligibilities by Service LocationId or Connection EAN code, or both.\n\nWhen both connectionpointean- and id-parameters are specified, this method resolves Connection details\nfrom C-AR (Electricity and Gas Connections only!) and other information from Service Location.\n\nWhen used with just connectionpointean-parameter, this method resolves Connection details from C-AR (Electricity\nand Gas Connections only!). If a BAG identifier is specified in C-AR, Service Location information is added as\nwell, otherwise all non-connection properties of the response will be empty\n\nThis is a special variation of endpoint `GET /v2/servicelocations/{serviceLocationId}?embed=technicaleligibilities-v1`\n\nWhen just serviceLocationId-parameter is specified, this method does _not_ resolve Connection details from C-AR.\n\nAll product eligibilities are re-evaluated based on resolved data. This differs from API\n`GET /v2/servicelocations/{serviceLocationId}?embed=technicaleligibilities-v1` which never includes C-AR data.\n",
+        "parameters": [
+          {
+            "name": "label",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "eneco",
+                "oxxio",
+                "woonenergie"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/pXRequestId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Combination of Service Location Id and/or Connection EANs.\n\nAll Connection EANs should belong to the same Location. Note that the properties `$.serviceLocationId` and\n`$.connectionPointEans` from `GET /v2/servicelocation/resolve`-reponse can be used.\n",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "object",
+                    "properties": {
+                      "serviceLocationId": {
+                        "$ref": "#/components/schemas/serviceLocationId"
+                      },
+                      "connectionPointEans": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/components/schemas/connectionPointEan"
+                        },
+                        "uniqueItems": true
+                      }
+                    },
+                    "required": [
+                      "connectionPointEans"
+                    ]
+                  }
+                },
+                "required": [
+                  "data"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ServiceLocation"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{label}/v2/servicelocations/resolve": {
+      "get": {
+        "tags": [
+          "servicelocation"
+        ],
+        "operationId": "GET/{label}/servicelocations/resolve",
+        "summary": "Resolve Addresses",
+        "description": "Resolve Addresses by various properties. Addresses are searched in the Centraal Aansluit Register (C-AR)\nand/or the Service Location Database (whoch is based on the _\"Basisregistratie Adressen en Gebouwen (BAG)\"_).\n\n                                                                                            ,.-^^-._\n                                                                                           |-.____.-|\n                                                                                           |        |\n                                                                                           |        |                               |   ,-.\n                                                     ┌──────────────────┐                  |        |                               +--{   )\n                                                     │servicelocation-v2│                  '-.____.-'                               |   `-'\n                                                     └────────┬─────────┘           ODP Service Location DB            Centraal Aansluit Register (C-AR)\n  GET v2/servicelocation/resolve?postalcode=..&housenumber=..┌┴┐                               │                                       │\n   ─────────────────────────────────────────────────────────>│ │                               │                                       │\n                                                             │ │                               │                                       │\n                                                             │ │ query ODP Service Location   ┌┴┐                                      │\n                                                             │ │ ───────────────────────────> │ │                                      │\n                                                             │ │                              └┬┘                                      │\n                                                             │ │                               │                                       │\n                                                             │ │ <─────────────────────────────│                                       │\n                                                             │ │                               │                                       │\n                                                             │ │                     SOAP 'Zoeken Aansluitingen'                      ┌┴┐\n                                                             │ │ ───────────────────────────────────────────────────────────────────> │ │\n                                                             │ │                               │                                      └┬┘\n                                                             │ │                           <<CARConnection>>                           │\n                                                             │ │ <─────────────────────────────────────────────────────────────────────│\n                                                             │ │                               │                                       │\n                <<ResolvedAddress>> (size:0-*)               │ │                               │                                       │\n   <─────────────────────────────────────────────────────────│ │                               │                                       │\n                                                     ┌───────└┬┘────────┐           ODP Service Location DB            Centraal Aansluit Register (C-AR)\n                                                     │servicelocation-v2│                   ,.-^^-._                                |   ,-.\n                                                     └──────────────────┘                  |-.____.-|                               +--{   )\n                                                                                           |        |                               |   `-'\n                                                                                           |        |\n                                                                                           |        |\n                                                                                           '-.____.-'\n\nQuery parameter `sources` specifies the sources to search for matching Address details. Multiple sources can\nbe specified, all sources will be searched for matching Address details.\n\nWhen no `source`-parameter is specified, a single default source (`sources=SERVICE_LOCATION`) is implied. Note\nthat performance of this endpoint will be greatly effected by the choice of sources to include.\n\nThe Centraal Aansluit Register (`source=C-AR`) can only be used in Business Processes that are allowed to use\ndata from this source (service; _\"EDSN - Zoeken van aansluitingen\"_).\n\nThe following combination of address parameters is valid;\n\n### 1. Search by Connection\n\n- connectionpointean\n\n### 2. Search by Postal Code + Housenumber\n\n- postalcode\n- housenumber*\n- _optional:_ housenumbersuffix\n\n### 3. Search by City + Street\n\n- city\n- street\n- housenumber*\n- _optional:_ housenumbersuffix\n- _optional:_ description\n- _optional:_ countrycode\n\n_*: When housenumber is empty, only locations without housenumber are returned._\n",
+        "parameters": [
+          {
+            "name": "label",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "eneco",
+                "oxxio",
+                "woonenergie"
+              ]
+            }
+          },
+          {
+            "name": "countrycode",
+            "description": "Country Code, only in combination with street, city and housenumber.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "NL",
+                "DE",
+                "BE"
+              ]
+            }
+          },
+          {
+            "name": "postalcode",
+            "description": "Postal code, only in combination with housenumber. When housenumber is empty, only locations without housenumber are returned.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "housenumber",
+            "description": "House number, only in combination with postal code or with street + city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "housenumbersuffix",
+            "description": "House number suffix, only in combination with postal code and house number or with street, city and house number",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "description",
+            "description": "Description, only in combination with street and city.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "street",
+            "description": "Street, only in combination with city and house number. When housenumber is empty, only locations without housenumber are returned.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "city",
+            "description": "City, only in combination with street and house number. When housenumber is empty, only locations without housenumber are returned.",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "connectionpointean",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/connectionPointEan"
+            }
+          },
+          {
+            "name": "sources",
+            "description": "Sources used for resolving of Address, if undefined, only Service Location database is searched",
+            "in": "query",
+            "required": false,
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "SERVICE_LOCATION",
+                  "C-AR"
+                ]
+              }
+            },
+            "example": [
+              "SERVICE_LOCATION"
+            ]
+          },
+          {
+            "$ref": "#/components/parameters/pXRequestId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ResolveServiceLocationResponse"
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method Not Allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseObject"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "azureAD": {
+        "type": "oauth2",
+        "description": "This API uses OAuth2.0 tokens (Azure Active Directory). Fetch a token at the specified tokenUrl with the client_id, client_secret and resource as body parameters. Use the scope that is specified for your working environment. You still have the option to use the v1 token endpoint (https://login.microsoftonline.com/eneco.onmicrosoft.com/oauth2/token) provided by Azure AD. The only difference is that you should use the \"resource\" minus the \"/.default\" as a body parameter instead of the mentioned \"scope\".",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://login.microsoftonline.com/eneco.onmicrosoft.com/oauth2/v2.0/token",
+            "scopes": {
+              "https://Eneco.onmicrosoft.com/ecsaz-apigee-odp-t/.default": "scope for dev and test",
+              "https://Eneco.onmicrosoft.com/ecsaz-apigee-odp-a/.default": "scope for acc",
+              "https://Eneco.onmicrosoft.com/ecsaz-apigee-odp-p/.default": "scope for prod"
+            }
+          }
+        }
+      },
+      "apikey": {
+        "name": "apikey",
+        "in": "header",
+        "type": "apiKey",
+        "description": "Apigee API key"
+      }
+    },
+    "parameters": {
+      "pEmbed": {
+        "name": "embed",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "adds Possibilities to the ServiceLocation",
+            "enum": [
+              "technicaleligibilities-v1"
+            ]
+          }
+        },
+        "description": "embed additional resources."
+      },
+      "pXRequestId": {
+        "name": "x-request-id",
+        "in": "header",
+        "description": "Unique identifier of the request for tracing purposes",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "responses": {
+      "ServiceLocation": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ServiceLocationResponse"
+            }
+          }
+        }
+      },
+      "ResolveServiceLocationResponse": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ResolveServiceLocationResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "serviceLocationId": {
+        "description": "Unique Service Location identifier. This identifier is usually sourced from the \"Basisregistratie Adressen en Gebouwen (BAG)\" dataset",
+        "type": "string",
+        "example": 177010000228326
+      },
+      "connectionPointEan": {
+        "description": "unique identifier of a utilityConnection",
+        "type": "string",
+        "example": 871688691902339200
+      },
+      "purposes": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "RESIDENTIAL",
+            "MEETING",
+            "PRISON",
+            "HEALTHCARE",
+            "INDUSTRIAL",
+            "OFFICE",
+            "ACCOMMODATION",
+            "EDUCATION",
+            "SPORTS",
+            "STORE",
+            "OTHER"
+          ]
+        }
+      },
+      "ResolveServiceLocationResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResolvedAddress"
+            }
+          }
+        }
+      },
+      "ResolvedAddress": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "array",
+            "description": "Service Location source.",
+            "items": {
+              "type": "string",
+              "description": "Service Location source. Can be SERVICE_LOCATION or C-AR"
+            },
+            "uniqueItems": true,
+            "example": [
+              "SERVICE_LOCATION",
+              "C-AR"
+            ]
+          },
+          "postalCode": {
+            "description": "postal code for this address",
+            "type": "string",
+            "example": "3068AV"
+          },
+          "houseNumber": {
+            "description": "house number of an address within a street",
+            "type": "integer",
+            "example": 5
+          },
+          "houseNumberSuffix": {
+            "description": "suffix to identify multiple addresses under the same house number",
+            "type": "string",
+            "example": null
+          },
+          "street": {
+            "description": "name of the street at the specified address",
+            "type": "string",
+            "example": "Marten Meesweg"
+          },
+          "city": {
+            "description": "city part of the address",
+            "type": "string",
+            "example": "ROTTERDAM"
+          },
+          "countryCode": {
+            "description": "code to unambiguously identify a country for an address",
+            "type": "string",
+            "example": "NL"
+          },
+          "addressSuffix": {
+            "description": "addition at the very end of an address",
+            "type": "string",
+            "example": null
+          },
+          "description": {
+            "description": "description of a location on the address",
+            "type": "string",
+            "example": null
+          },
+          "serviceLocationId": {
+            "$ref": "#/components/schemas/serviceLocationId"
+          },
+          "serviceLocationType": {
+            "type": "string",
+            "description": "Type of ServiceLocation",
+            "enum": [
+              "RESIDENCE_OBJECT",
+              "BERTH",
+              "STAND"
+            ]
+          },
+          "purposes": {
+            "$ref": "#/components/schemas/purposes"
+          },
+          "connectionPointEans": {
+            "type": "array",
+            "description": "all Connection EANs on this location. This property is an aggregation of `$.connections[*].connectionPointEan`",
+            "items": {
+              "$ref": "#/components/schemas/connectionPointEan"
+            },
+            "uniqueItems": true
+          },
+          "connections": {
+            "description": "C-AR or ServiceLocation properties of a Connection present on the Address",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "connectionPointEan": {
+                  "$ref": "#/components/schemas/connectionPointEan"
+                },
+                "utilityType": {
+                  "description": "utilitytypecode of a utilityConnection",
+                  "type": "string",
+                  "enum": [
+                    "ELK",
+                    "GAS",
+                    "WTW",
+                    "WRM",
+                    "KOU",
+                    "INVALID"
+                  ]
+                },
+                "gridOperator": {
+                  "$ref": "#/components/schemas/DistributionNetworkOperator"
+                },
+                "meterNumberLastDigits": {
+                  "type": "string",
+                  "description": "Last 4 digits of Meter number",
+                  "example": 8532
+                },
+                "connectionKind": {
+                  "type": "string",
+                  "description": "Kind of Connection (C-AR; 'Aansluiting soort')",
+                  "enum": [
+                    "ABR",
+                    "AFV",
+                    "ALG",
+                    "CAI",
+                    "CAM",
+                    "DIV",
+                    "ELP",
+                    "EVE",
+                    "GAR",
+                    "GAS",
+                    "GML",
+                    "GSM",
+                    "GWN",
+                    "HFD",
+                    "KSK",
+                    "LDN",
+                    "LDS",
+                    "ODN",
+                    "OVL",
+                    "PAR",
+                    "RIO",
+                    "SIR",
+                    "STW",
+                    "SUB",
+                    "TAS",
+                    "VPY",
+                    "VRI",
+                    "WKK",
+                    "WML",
+                    "ZTL"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "purposes",
+          "connectionPointEans",
+          "connections"
+        ]
+      },
+      "ServiceLocationResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ServiceLocation"
+          }
+        }
+      },
+      "ServiceLocation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/serviceLocationId"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of ServiceLocation",
+            "enum": [
+              "RESIDENCE_OBJECT",
+              "BERTH",
+              "STAND"
+            ]
+          },
+          "purposes": {
+            "$ref": "#/components/schemas/purposes"
+          },
+          "residenceType": {
+            "type": "string",
+            "enum": [
+              "FLAT_OTHER",
+              "GALLERY_FLAT",
+              "STAIRCASE_ENTRANCE_FLAT",
+              "MAISONETTE",
+              "TERRACED_HOUSE",
+              "CORNER_HOUSE",
+              "SEMI_DETACHED",
+              "DETACHED_HOUSE",
+              "NON_RESIDENTIAL",
+              "OTHER"
+            ],
+            "example": "GALLERY_FLAT"
+          },
+          "residenceSubType": {
+            "type": "string",
+            "enum": [
+              "BETWEEN_FLOOR",
+              "BETWEEN_MIDDLE",
+              "BETWEEN_ROOF",
+              "BETWEEN_ROOF_FLOOR",
+              "CORNER_FLOOR",
+              "CORNER_MIDDLE",
+              "CORNER_ROOF",
+              "CORNER_ROOF_FLOOR",
+              "SEMI_DETACHED",
+              "TERRACED_HOUSE",
+              "UNKNOWN"
+            ],
+            "example": "BETWEEN_MIDDLE"
+          },
+          "energyLabel": {
+            "type": "string"
+          },
+          "usableAreaM2": {
+            "type": "number"
+          },
+          "estimatedYearlyElectricityConsumptionKwh": {
+            "type": "number"
+          },
+          "estimatedYearlyElectricityProductionKwh": {
+            "type": "number"
+          },
+          "estimatedYearlyGasConsumptionM3": {
+            "type": "number"
+          },
+          "estimatedYearlyHeatConsumptionGJ": {
+            "type": "number"
+          },
+          "hasElectricityConnection": {
+            "type": "boolean",
+            "description": "can Electricitry be delivered on this Service Location"
+          },
+          "hasGasConnection": {
+            "type": "boolean",
+            "description": "can Gas be delivered on this Service Location"
+          },
+          "hasHeatDeliveryConnection": {
+            "type": "boolean",
+            "description": "can District Heating be delivered on this Service Location"
+          },
+          "hasCoolingDeliveryConnection": {
+            "type": "boolean",
+            "description": "can Cooling be delivered on this Service Location"
+          },
+          "hasSourceHeatPump": {
+            "type": "boolean"
+          },
+          "hasHotTapWaterConnection": {
+            "type": "boolean",
+            "description": "can Domestic Hot Tap Water be delivered on this Service Location"
+          },
+          "hasEkv": {
+            "type": "boolean",
+            "description": "can District Heating (with 'Elektronische Kostenverdeling') be delivered on this Service Location"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "postalCode": {
+                "description": "postal code for this address",
+                "type": "string",
+                "example": "3068AV"
+              },
+              "houseNumber": {
+                "description": "house number of an address within a street",
+                "type": "integer",
+                "example": 5
+              },
+              "houseNumberSuffix": {
+                "description": "suffix to identify multiple addresses under the same house number",
+                "type": "string",
+                "example": null
+              },
+              "street": {
+                "description": "name of the street at the specified address",
+                "type": "string",
+                "example": "Marten Meesweg"
+              },
+              "city": {
+                "description": "city part of the address",
+                "type": "string",
+                "example": "ROTTERDAM"
+              },
+              "countryCode": {
+                "description": "code to unambiguously identify a country for an address",
+                "type": "string",
+                "example": "NL"
+              },
+              "addressSuffix": {
+                "description": "addition at the very end of an address",
+                "type": "string",
+                "example": null
+              },
+              "description": {
+                "description": "description of a location on the address",
+                "type": "string",
+                "example": null
+              },
+              "geoLocation": {
+                "description": "geo location",
+                "type": "object",
+                "properties": {
+                  "longitude": {
+                    "description": "longitude",
+                    "type": "number",
+                    "format": "float",
+                    "example": 4.556166
+                  },
+                  "latitude": {
+                    "description": "latitude",
+                    "type": "number",
+                    "format": "float",
+                    "example": 51.952897
+                  },
+                  "coordinateReferenceSystem": {
+                    "description": "geo location spatial reference",
+                    "type": "string",
+                    "example": "EPSG:4326"
+                  }
+                },
+                "required": [
+                  "longitude",
+                  "latitude",
+                  "coordinateReferenceSystem"
+                ]
+              }
+            }
+          },
+          "connections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Connection"
+            }
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "_embedded": {
+            "type": "object",
+            "description": "contains embedded objects belonging to this resource",
+            "properties": {
+              "technicalEligibilities": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Eligibility"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "purposes",
+          "address",
+          "connections",
+          "devices"
+        ]
+      },
+      "Connection": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ElectricityConnection"
+          },
+          {
+            "$ref": "#/components/schemas/GasConnection"
+          },
+          {
+            "$ref": "#/components/schemas/HeatConnection"
+          },
+          {
+            "$ref": "#/components/schemas/ColdConnection"
+          },
+          {
+            "$ref": "#/components/schemas/DomesticHotWaterConnection"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "utilityType",
+          "mapping": {
+            "ELK": "ElectricityConnection",
+            "GAS": "GasConnection",
+            "WRM": "HeatConnection",
+            "KOU": "ColdConnection",
+            "WTW": "DomesticHotWaterConnection"
+          }
+        }
+      },
+      "BaseConnection": {
+        "type": "object",
+        "discriminator": {
+          "propertyName": "utilityType"
+        },
+        "properties": {
+          "connectionPointEan": {
+            "$ref": "#/components/schemas/connectionPointEan"
+          },
+          "utilityType": {
+            "description": "utilitytypecode of a utility connection",
+            "type": "string",
+            "enum": [
+              "ELK",
+              "GAS",
+              "WTW",
+              "WRM",
+              "KOU"
+            ]
+          },
+          "realizingService": {
+            "$ref": "#/components/schemas/RealizingService"
+          }
+        },
+        "required": [
+          "utilityType"
+        ]
+      },
+      "ElectricityConnection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseConnection"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "physicalCapacity": {
+                "description": "physical capacity of this utility connection",
+                "type": "string",
+                "enum": [
+                  "1x6",
+                  "1x10",
+                  "1x25",
+                  "1x35",
+                  "1x50",
+                  "1x63",
+                  "1x80",
+                  "3x25",
+                  "3x35",
+                  "3x50",
+                  "3x63",
+                  "3x80",
+                  "OBK"
+                ]
+              },
+              "physicalUsageProfile": {
+                "description": "the Tennet code that uniquely identifies the usage profile that is currently associated with this utility connection (may change over time)",
+                "type": "string",
+                "enum": [
+                  "E1A",
+                  "E1B",
+                  "E1C",
+                  "E2A",
+                  "E2B",
+                  "E3A",
+                  "E3B",
+                  "E3C",
+                  "E3D",
+                  "E4A",
+                  "OPC"
+                ]
+              },
+              "gridOperator": {
+                "$ref": "#/components/schemas/DistributionNetworkOperator"
+              }
+            },
+            "required": [
+              "physicalCapacity",
+              "physicalUsageProfile"
+            ]
+          }
+        ]
+      },
+      "GasConnection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseConnection"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "physicalCapacity": {
+                "description": "physical capacity of this utility connection",
+                "type": "string",
+                "enum": [
+                  "G4",
+                  "G6",
+                  "G10",
+                  "G16",
+                  "G25",
+                  "G40",
+                  "G65",
+                  "G100",
+                  "G160",
+                  "G250",
+                  "G400",
+                  "G650",
+                  "G1000",
+                  "G1600",
+                  "G2500",
+                  "OBK"
+                ]
+              },
+              "physicalUsageProfile": {
+                "description": "the Tennet code that uniquely identifies the usage profile that is currently associated with this utility connection (may change over time)",
+                "type": "string",
+                "enum": [
+                  "G1A",
+                  "G2A",
+                  "G2C",
+                  "GGV",
+                  "GXX",
+                  "GIS",
+                  "GIN"
+                ]
+              },
+              "gridOperator": {
+                "$ref": "#/components/schemas/DistributionNetworkOperator"
+              }
+            },
+            "required": [
+              "physicalCapacity",
+              "physicalUsageProfile"
+            ]
+          }
+        ]
+      },
+      "HeatConnection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseConnection"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "locationProfileGroups": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "assetEndDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "assetEndDateReason": {
+                "type": "string"
+              },
+              "isEkvConnection": {
+                "type": "boolean"
+              },
+              "isThermalEnergyStorageConnection": {
+                "type": "boolean"
+              },
+              "thermalEnergyStorageCapacity": {
+                "type": "number"
+              },
+              "heatLawCategory": {
+                "type": "string"
+              },
+              "coldWaterArea": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "coldVariant": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "isCoolingCoupled": {
+                "type": "boolean"
+              },
+              "coolingCapacity": {
+                "type": "number"
+              },
+              "deliveryProductName": {
+                "type": "string"
+              },
+              "deliveryProductClass": {
+                "type": "string"
+              },
+              "deliveryDescription": {
+                "type": "string"
+              },
+              "discountCodes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DiscountCode"
+                }
+              }
+            },
+            "required": [
+              "discountCodes"
+            ]
+          }
+        ]
+      },
+      "ColdConnection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseConnection"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "locationProfileGroups": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "assetEndDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "assetEndDateReason": {
+                "type": "string"
+              },
+              "isThermalEnergyStorageConnection": {
+                "type": "boolean"
+              },
+              "thermalEnergyStorageCapacity": {
+                "type": "number"
+              },
+              "heatLawCategory": {
+                "type": "string"
+              },
+              "coldWaterArea": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "coldVariant": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "isCoolingCoupled": {
+                "type": "boolean"
+              },
+              "coolingCapacity": {
+                "type": "number"
+              },
+              "deliveryProductName": {
+                "type": "string"
+              },
+              "deliveryProductClass": {
+                "type": "string"
+              },
+              "deliveryDescription": {
+                "type": "string"
+              },
+              "discountCodes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DiscountCode"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DomesticHotWaterConnection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseConnection"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "locationProfileGroups": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "assetEndDate": {
+                "type": "string",
+                "format": "date"
+              },
+              "assetEndDateReason": {
+                "type": "string"
+              },
+              "heatLawCategory": {
+                "type": "string"
+              },
+              "coldWaterArea": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "coldVariant": {
+                "type": "integer",
+                "format": "int32",
+                "example": 1
+              },
+              "deliveryProductName": {
+                "type": "string"
+              },
+              "deliveryProductClass": {
+                "type": "string"
+              },
+              "deliveryDescription": {
+                "type": "string"
+              },
+              "discountCodes": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DiscountCode"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DiscountCode": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "DistributionNetworkOperator": {
+        "type": "object",
+        "properties": {
+          "ean": {
+            "description": "ean code of the distribution network operator",
+            "type": "string",
+            "example": 8716948000003
+          },
+          "name": {
+            "description": "name of the distribution network operator",
+            "type": "string",
+            "example": "Enexis B.V."
+          }
+        },
+        "required": [
+          "ean"
+        ]
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "device id",
+            "example": "STOB00025"
+          },
+          "type": {
+            "description": "device type",
+            "type": "string",
+            "example": "HUUR"
+          },
+          "category": {
+            "description": "device category",
+            "type": "string",
+            "example": "CV-ketel"
+          },
+          "typeCode": {
+            "type": "string",
+            "description": "device type code"
+          },
+          "typeDescription": {
+            "type": "string",
+            "description": "device type description"
+          },
+          "typeProductClass": {
+            "type": "string",
+            "description": "device type product class"
+          },
+          "placementDate": {
+            "type": "string",
+            "format": "date",
+            "description": "device placement date"
+          },
+          "deliveryType": {
+            "type": "string"
+          },
+          "deliveryDescription": {
+            "type": "string"
+          },
+          "deliveryProductClass": {
+            "type": "string"
+          },
+          "locationId": {
+            "type": "string",
+            "description": "Navision location id"
+          },
+          "locationProfileGroups": {
+            "type": "integer",
+            "description": "Location profile groups"
+          },
+          "usageSegment": {
+            "type": "string",
+            "description": "Usage segment"
+          },
+          "discountCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiscountCode"
+            }
+          },
+          "realizingService": {
+            "$ref": "#/components/schemas/RealizingService"
+          },
+          "deliverySetProperties": {
+            "$ref": "#/components/schemas/DeliverySetProperties"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "discountCodes"
+        ]
+      },
+      "RealizingService": {
+        "type": "object",
+        "properties": {
+          "deliveryId": {
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "deliveryLocation": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "number to uniquely identify a location within an Address",
+                "format": "int32",
+                "example": 34760168
+              },
+              "locationDescription": {
+                "type": "string",
+                "description": "free text field with instructions on how to find a location"
+              },
+              "address": {
+                "$ref": "#/components/schemas/Address"
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        "required": [
+          "deliveryId",
+          "deliveryLocation"
+        ]
+      },
+      "DeliverySetProperties": {
+        "type": "object",
+        "properties": {
+          "usage": {
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "numberOfConnections": {
+            "type": "number",
+            "format": "int32"
+          },
+          "isCollective": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "postalCode": {
+            "description": "postal code for this address",
+            "type": "string",
+            "example": "3068AV"
+          },
+          "houseNumber": {
+            "description": "house number of an address within a street",
+            "type": "integer",
+            "example": 5
+          },
+          "houseNumberSuffix": {
+            "description": "suffix to identify multiple addresses under the same house number",
+            "type": "string",
+            "example": null
+          },
+          "street": {
+            "description": "name of the street at the specified address",
+            "type": "string",
+            "example": "Marten Meesweg"
+          },
+          "city": {
+            "description": "city part of the address",
+            "type": "string",
+            "example": "ROTTERDAM"
+          },
+          "countryCode": {
+            "description": "code to unambiguously identify a country for an address",
+            "type": "string",
+            "example": "NL"
+          },
+          "description": {
+            "description": "description of a location on the address",
+            "type": "string",
+            "example": null
+          }
+        }
+      },
+      "Eligibility": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Eligibility category name, f.e; Functional product category (Electricity, Gas, Heating&Cold, Ketelcomfort, HappyPower, ..)",
+            "example": "FUNCPROD_ELECTRICITY"
+          },
+          "eligible": {
+            "type": "boolean",
+            "example": false
+          },
+          "reasons": {
+            "type": "array",
+            "description": "if not elligible, all reasons why are listed here",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "number",
+                  "format": "int32",
+                  "description": "Eligibility Rule id",
+                  "example": 12
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Eligibility Rule script faulted"
+                }
+              },
+              "required": [
+                "id"
+              ]
+            }
+          }
+        },
+        "required": [
+          "code",
+          "eligible",
+          "reasons"
+        ]
+      },
+      "ErrorResponseObject": {
+        "description": "Response object containing errors",
+        "type": "object",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "description": "HTTP status code of the error",
+                  "example": 404
+                },
+                "detail": {
+                  "type": "string",
+                  "example": "Service Location not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
